@@ -1,0 +1,28 @@
+from playwright.sync_api import sync_playwright
+from pathlib import Path
+base='file:///mnt/data/flourish-v9-work'
+with sync_playwright() as p:
+ b=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+ page=b.new_page(viewport={'width':1440,'height':900},device_scale_factor=1)
+ errs=[];page.on('pageerror',lambda e: errs.append(str(e)))
+ page.goto(base+'/index.html',wait_until='networkidle');page.wait_for_timeout(400)
+ page.screenshot(path='/mnt/data/flourish-desktop.png',full_page=True)
+ print('homepage',page.title(),'hero',page.locator('#honey-body').get_attribute('d')[:120], 'featured', page.locator('#featured-products .product-card').count())
+ page.goto(base+'/shop.html',wait_until='networkidle');page.screenshot(path='/mnt/data/flourish-shop.png',full_page=True)
+ print('shop products',page.locator('#shop-products .product-card').count())
+ page.locator('.mini-add').first.click(); print('cart bag count',page.locator('[data-cart-count]').first.text_content())
+ page.locator('[data-open-cart]').click();print('cart open',page.locator('#cart-panel').evaluate('(e)=>e.open'))
+ page.locator('[data-cart-close]').first.click()
+ page.goto(base+'/admin.html',wait_until='networkidle');page.screenshot(path='/mnt/data/flourish-admin.png',full_page=True);print('admin products',page.locator('.admin-listing').count())
+ page.locator('input[name="name"]').fill('Autumn Test Honey')
+ page.locator('textarea[name="description"]').fill('A delicious autumn batch, test listing.')
+ page.locator('input[name="price"]').fill('29.00')
+ page.locator('input[name="stock"]').fill('9')
+ page.locator('#save-product').click();print('after save',page.locator('.admin-listing').count())
+ page.goto(base+'/shop.html');print('shop after save',page.locator('#shop-products .product-card').count())
+ mobile=b.new_page(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True)
+ mobile.on('pageerror',lambda e: errs.append(str(e)))
+ mobile.goto(base+'/index.html',wait_until='networkidle'); mobile.screenshot(path='/mnt/data/flourish-mobile.png',full_page=True)
+ print('mobile body width',mobile.locator('body').evaluate('e=>e.scrollWidth'), 'viewport',390)
+ mobile.locator('#menu-toggle').click();print('mobile menu visible',mobile.locator('#mobile-menu').is_visible())
+ print('ERRORS',errs[:30]);b.close()

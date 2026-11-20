@@ -76,3 +76,6 @@ To move from preview to live:
 ## Version
 
 V9 · November 2026 · Brand Axis / concept prototype
+
+## Footer bee (v11)
+The footer on every page now includes a custom inline SVG golden bee in `.footer-bee`, with subtle hovering and wing motion. CSS is at the end of `site.css`; the bee respects reduced-motion preferences. No image or dependency is needed.
