@@ -1,4 +1,4 @@
-# FLOURISH BEE FARM — V9 CUSTOM WEBSITE (PITCH PREVIEW)
+# FLOURISH BEE FARM — V12 CUSTOM WEBSITE (PITCH PREVIEW)
 
 Custom-built by Brand Axis as a creative sales concept for Flourish Bee Farm.
 
@@ -71,11 +71,11 @@ To move from preview to live:
 
 ## Animation notes
 
-`honey.js` generates a continuous full-width viscous honey band with rounded irregular drips. The drips elongate gently as the visitor scrolls, and retract on upward scrolling. It respects system reduced-motion preferences. Honey is layered above the next section so the drips hang down across the edge, matching the visual direction from Brand Axis's reference. This is a custom SVG/CSS/JavaScript animation, not a static image.
+The honey pools across the hero edge and gathers into one rounded drop on the right. The drop stretches on downward scroll and retracts when the visitor scrolls back, while the surface ripples gently. The canvas renderer shades the live silhouette and refracts the hero image through it. The SVG supplies a fallback, and the effect is still when the visitor requests reduced motion.
 
 ## Version
 
-V9 · November 2026 · Brand Axis / concept prototype
+V12 · November 2026 · Brand Axis / concept prototype
 
 ## Footer bee (v11)
 The footer on every page now includes a custom inline SVG golden bee in `.footer-bee`, with subtle hovering and wing motion. CSS is at the end of `site.css`; the bee respects reduced-motion preferences. No image or dependency is needed.
