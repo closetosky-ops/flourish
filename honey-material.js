@@ -117,7 +117,8 @@
 
     function resize(width, height, seam, heroHeight) {
       if (!enabled) return;
-      readPhoto();
+      const photoAtLip = photo.getBoundingClientRect().bottom >= edge.getBoundingClientRect().top;
+      if (photoAtLip) readPhoto();
       const scale = Math.min(1, 1120 / width);
       const pixelsAcross = Math.max(1, Math.round(width * scale));
       const pixelsDown = Math.max(1, Math.round(height * scale));
@@ -140,8 +141,10 @@
       const drawWidth = sourceWidth * cover;
       const drawHeight = sourceHeight * cover;
       const [x, y] = getComputedStyle(photo).objectPosition.split(/\s+/);
+      const background = getComputedStyle(edge.parentElement).backgroundColor
+        .match(/[\d.]+/g)?.slice(0, 3).map(value => Number(value) / 255) ?? [0.13, 0.20, 0.14];
       layout = {
-        width, seam, heroHeight, scale, pad, drawWidth, drawHeight,
+        width, seam, heroHeight, scale, pad, drawWidth, drawHeight, photoAtLip, background,
         offsetX: (width - drawWidth) * positionFraction(x),
         offsetY: (heroHeight - drawHeight) * positionFraction(y || 'center')
       };
@@ -175,7 +178,10 @@
     }
 
     function shade(path, shape) {
-      const { width, seam, heroHeight, scale, pad, drawWidth, drawHeight, offsetX, offsetY } = layout;
+      const {
+        width, seam, heroHeight, scale, pad, drawWidth, drawHeight, offsetX, offsetY,
+        photoAtLip, background
+      } = layout;
       const w = frame.width;
       const h = frame.height;
       const stride = w * 4;
@@ -224,20 +230,22 @@
           let r = 0.969;
           let g = 0.945;
           let b = 0.898;
-          if (page < 1 && photoPixels) {
+          if (page < 1 && photoAtLip && photoPixels) {
             const inside = heroHeight - seam + ty;
             const ix = clamp(Math.round((tx - offsetX) * photoWidth / drawWidth), 0, photoWidth - 1);
             const iy = clamp(Math.round((inside - offsetY) * photoHeight / drawHeight), 0, photoHeight - 1);
             const color = (iy * photoWidth + ix) * 4;
             const across = clamp(tx / width, 0, 1);
-            const shadow = width <= 700
-              ? mix(0.86, 0.40, across)
-              : mix(0.94, 0.21, smooth(across));
+            const shadow = mix(0.94, 0.21, smooth(across));
             const light = (1 - shadow) * 0.64 / 255;
             const tint = 1 - light * 255;
             r = mix(photoPixels[color] * light + tint * 0.045, r, page);
             g = mix(photoPixels[color + 1] * light + tint * 0.091, g, page);
             b = mix(photoPixels[color + 2] * light + tint * 0.053, b, page);
+          } else if (page < 1) {
+            r = mix(background[0], r, page);
+            g = mix(background[1], g, page);
+            b = mix(background[2], b, page);
           }
 
           const a = rounded[pixel] * 3;
